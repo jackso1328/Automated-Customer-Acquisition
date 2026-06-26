@@ -1,0 +1,217 @@
+:root {
+    --bg-main: #f8f9fc;
+    --panel-color: #ffffff;
+    --sea-blue: #006494;
+    --sea-blue-light: #24b1d6;
+    --lavender: #e2e2f9;
+    --lavender-dark: #6c5ce7;
+    --text-primary: #2d3436;
+    --text-secondary: #636e72;
+    --border-color: #e2e8f0;
+    --success: #00b894;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    min-height: 100vh;
+}
+
+/* Navbar Layout */
+.navbar {
+    background-color: var(--sea-blue);
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.sbi-logo {
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    margin-right: 10px;
+    border-right: 2px solid rgba(255, 255, 255, 0.4);
+    padding-right: 10px;
+}
+
+.app-title {
+    font-weight: 300;
+    color: var(--lavender);
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.15);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+}
+
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--success);
+    border-radius: 50%;
+    margin-right: 8px;
+    box-shadow: 0 0 0 0 rgba(0, 184, 148, 0.7);
+    animation: pulse 1.6s infinite;
+}
+
+/* Metrics Section */
+.dashboard-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.metrics-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.metric-card {
+    background-color: var(--panel-color);
+    border-left: 5px solid var(--lavender-dark);
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.metric-card h3 {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.metric-card p {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--sea-blue);
+    margin-top: 0.5rem;
+}
+
+/* Leads Registry Grid */
+.content-panel {
+    background-color: var(--panel-color);
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.filter-group select {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+}
+
+.leads-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Custom Card Styles */
+.opportunity-card {
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.opportunity-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+}
+
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.company-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--sea-blue);
+}
+
+.confidence-badge {
+    background-color: var(--lavender);
+    color: var(--lavender-dark);
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.signal-text {
+    font-style: italic;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.product-fit-box {
+    background-color: white;
+    border-left: 3px solid var(--sea-blue-light);
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.product-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--sea-blue-light);
+    font-weight: 700;
+}
+
+.product-name {
+    font-weight: 600;
+    margin-top: 0.2rem;
+}
+
+.justification-text {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: var(--text-primary);
+}
+
+.loading-state {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 3rem 0;
+    grid-column: 1 / -1;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 184, 148, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(0, 184, 148, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 184, 148, 0); }
+}

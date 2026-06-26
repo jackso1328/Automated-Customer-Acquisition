@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SBI Opportunity Scout Command Center</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="brand">
+            <span class="sbi-logo">State Bank of India</span>
+            <span class="app-title">Opportunity Scout Agent</span>
+        </div>
+        <div class="status-indicator">
+            <div class="pulse-dot"></div>
+            <span>Agent Daemon: Active Monitoring</span>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <section class="metrics-bar">
+            <div class="metric-card">
+                <h3>Total Signals Found</h3>
+                <p id="metric-total">0</p>
+            </div>
+            <div class="metric-card">
+                <h3>High Confidence Leads (>85%)</h3>
+                <p id="metric-high">0</p>
+            </div>
+            <div class="metric-card">
+                <h3>Target Sectors Tracked</h3>
+                <p id="metric-sectors">4</p>
+            </div>
+        </section>
+
+        <section class="content-panel">
+            <div class="panel-header">
+                <h2>Discovered Signals Registry</h2>
+                <div class="filter-group">
+                    <label for="product-filter">Product Focus:</label>
+                    <select id="product-filter">
+                        <option value="all">All Products</option>
+                        <option value="loan">Loans / Project Finance</option>
+                        <option value="guarantee">Bank Guarantees / LC</option>
+                        <option value="agri">Agri Credit / KCC</option>
+                        <option value="retail">Edu / Retail Accounts</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="leads-grid" class="leads-grid">
+                <div class="loading-state">Awaiting internet signals...</div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

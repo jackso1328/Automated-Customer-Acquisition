@@ -3,6 +3,7 @@ from src.scouts.edu_scout import EduScout
 
 class ScoutOrchestrator:
     def __init__(self):
+        # We start with the EduScout; we will append agri and corp scouts here next
         self.scouts = [
             EduScout()
         ]

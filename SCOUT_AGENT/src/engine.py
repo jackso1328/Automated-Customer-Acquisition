@@ -11,7 +11,7 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 # Using a popular, highly-capable free tier model on OpenRouter
-MODEL_NAME = "meta-llama/llama-3-8b-instruct:free"
+MODEL_NAME = "nvidia/nemotron-3-ultra-550b-a55b:free"
 
 def analyze_signal_with_llm(raw_scraped_text):
     """

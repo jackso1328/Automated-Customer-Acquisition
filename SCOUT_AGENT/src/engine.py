@@ -25,6 +25,8 @@ def analyze_signal_with_llm(raw_scraped_text):
         "CRITICAL BUSINESS RULES:\n"
         "- If the text mentions 'merit list', 'counselling', 'admission', or 'exam results', this means students urgently need funds to secure college seats. YOU MUST SCORE THIS >= 0.85 and recommend 'SBI Education Loan' or 'SBI Scholar Loan'.\n"
         "- If the text mentions 'visa', 'studying abroad', or 'foreign universities', students need international funding. YOU MUST SCORE THIS >= 0.90 and recommend 'SBI Global Ed-Vantage Scheme'.\n\n"
+        "- If a company wins a 'government tender' or 'contract', they immediately need financial backing. YOU MUST SCORE THIS >= 0.90 and recommend 'SBI Bank Guarantee' or 'Project Finance'.\n"
+        "- If a company announces a 'plant expansion', 'new factory', or 'data center', they need capital. YOU MUST SCORE THIS >= 0.85 and recommend 'SBI Corporate Term Loan'.\n"
         "Respond ONLY with a valid JSON object matching this exact schema layout. Do not include markdown wraps or trailing commentary:\n"
         "{\n"
         '  "company_or_entity": "Name of the exam, board, or institution",\n'

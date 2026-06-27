@@ -1,0 +1,93 @@
+[
+    {
+        "company_or_entity": "MHT CET CAP 2026",
+        "detected_signal": "Registration, Dates, Merit List & Counselling for MHT CET CAP 2026",
+        "sbi_product_fit": "SBI Education Loan",
+        "confidence_score": 0.9,
+        "justification": "The mention of merit list and counselling indicates students are in the admission process and urgently need funds to secure college seats, making SBI Education Loan the ideal product."
+    },
+    {
+        "company_or_entity": "BITSAT 2026 (Birla Institute of Technology and Science Admission Test)",
+        "detected_signal": "Counselling ongoing, Iteration I results released, admission process underway for BITS campuses",
+        "sbi_product_fit": "SBI Education Loan",
+        "confidence_score": 0.9,
+        "justification": "Students who have been allotted seats in BITSAT counselling need immediate funds to pay admission fees, secure their seats, and cover tuition costs. The ongoing counselling and iteration results indicate urgent financial requirement for seat confirmation, making SBI Education Loan the ideal product for quick disbursement and competitive rates."
+    },
+    {
+        "company_or_entity": "UP BTech Admission 2026",
+        "detected_signal": "Students applying for engineering admission with counseling process",
+        "sbi_product_fit": "SBI Education Loan",
+        "confidence_score": 0.87,
+        "justification": "The mention of 'counselling' and 'admission' indicates urgent financial needs for college seat reservation, which aligns with SBI Education Loan requirements for tuition fees and related expenses."
+    },
+    {
+        "company_or_entity": "SBI Global Ed-Vantage Scheme",
+        "detected_signal": "Currency crash and visa crackdowns force Indian students to rethink studying abroad",
+        "sbi_product_fit": "SBI Global Ed-Versiona Scheme",
+        "confidence_score": 0.95,
+        "justification": "Students face visa restrictions and currency instability, leading to increased reliance on SBI's tailored funding solutions."
+    },
+    {
+        "company_or_entity": "Prodigy Finance",
+        "detected_signal": "Students facing increased costs for Fall 2026 admissions in the US may need financial assistance for international education.",
+        "sbi_product_fit": "SBI Global Ed-Vantage Scheme",
+        "confidence_score": 0.95,
+        "justification": "The headline indicates Indian students are likely seeking funds to cover rising expenses for admissions to foreign universities starting in Fall 2026. This aligns with the 'visa' and 'studying abroad' criteria, necessitating the SBI Global Ed-Vantage Scheme for international funding support."
+    },
+    {
+        "company_or_entity": "India Today",
+        "detected_signal": "Students planning to fund education abroad benefit from tax reductions announced in Budget 2026",
+        "sbi_product_fit": "SBI Global Ed-Vantage Scheme",
+        "confidence_score": 0.92,
+        "justification": "The article targets students intending to study overseas, which aligns with the SBI Global Ed-Vantage Scheme designed for international education financing."
+    },
+    {
+        "company_or_entity": "MHT CET (Maharashtra Common Entrance Test)",
+        "detected_signal": "Registration, merit list announcement and counseling process for 2026 admissions",
+        "sbi_product_fit": "SBI Education Loan",
+        "confidence_score": 0.88,
+        "justification": "MHT CET counseling involves students securing engineering, pharmacy and other professional course seats in Maharashtra colleges. These students urgently need education financing to pay admission fees, tuition fees and other academic expenses. SBI Education Loan provides timely funding with flexible repayment options to help students complete admission formalities through state-backed competitive interest rates."
+    },
+    {
+        "company_or_entity": "BITSAT 2026",
+        "detected_signal": "Counselling and admission process ongoing for 2026 BITSAT exam",
+        "sbi_product_fit": "SBI Education Loan",
+        "confidence_score": 0.85,
+        "justification": "The text explicitly mentions 'counselling' and 'admission', indicating students urgently require funds to secure college seats under the BITSAT 2026 admission cycle. SBI Education Loan is designed to cater to such immediate educational funding needs."
+    },
+    {
+        "company_or_entity": "Indian Students",
+        "detected_signal": "Currency crash and visa crackdowns forcing Indian students to reconsider studying abroad plans",
+        "sbi_product_fit": "SBI Global Ed-Vantage Scheme",
+        "confidence_score": 0.92,
+        "justification": "The text directly mentions 'studying abroad' and 'visa crackdowns', indicating urgent international education funding needs. Indian students facing currency instability and visa challenges require specialized foreign education financing solutions that the SBI Global Ed-Vantage Scheme provides for overseas studies."
+    },
+    {
+        "company_or_entity": "Indian Students (Fall 2026 intake)",
+        "detected_signal": "Seeking financial relief for upcoming Fall 2026 semester costs, currently receiving deposit relief via Prodigy Finance",
+        "sbi_product_fit": "SBI Global Ed-Vantage Scheme",
+        "confidence_score": 0.92,
+        "justification": "The reference to Fall 2026 costs indicates plans for international higher education, triggering the need for cross-border funding; SBI's Global Ed-Vantage Scheme is designed for students studying abroad and covers tuition, living expenses, and related costs."
+    },
+    {
+        "company_or_entity": "Shiksha",
+        "detected_signal": "UP CNET 2026 Counselling and Seat Allotment Results",
+        "sbi_product_fit": "SBI Education Loan",
+        "confidence_score": 0.95,
+        "justification": "The mention of 'Counselling' and 'Seat Allotment Result' indicates urgent student needs for college admission funds, aligning with SBI's Education Loan products designed for such scenarios."
+    },
+    {
+        "company_or_entity": "MCC NEET Counselling 2026",
+        "detected_signal": "Medical counselling process for NEET 2026 admissions with seat allotment result publication",
+        "sbi_product_fit": "SBI Education Loan",
+        "justification": "NEET counselling results trigger immediate seat allotment, requiring urgent payment of tuition/hostel fees by admitted students. SBI Education Loan provides swift disbursement for domestic higher education expenses, directly addressing the financial gap during admission confirmation.",
+        "confidence_score": 0.92
+    },
+    {
+        "company_or_entity": "NEET PG 2025 Counselling (MCC PG round 3)",
+        "detected_signal": "Students need immediate funding to secure admissions after NEET PG counselling for postgraduate medical seats",
+        "sbi_product_fit": "SBI Education Loan",
+        "confidence_score": 0.9,
+        "justification": "The text references NEET PG 2025 Counselling, which directly relates to admission processes for postgraduate medical programmes. Students require urgent financial support to cover tuition fees and living expenses to secure their seats, making the SBI Education Loan the appropriate product to meet this need."
+    }
+]

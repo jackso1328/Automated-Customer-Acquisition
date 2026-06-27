@@ -17,14 +17,9 @@ class EduScout(BaseScout):
         ]
 
     def scan_for_opportunities(self):
-        """
-        Executes the autonomous loop: generates search queries, finds links,
-        extracts text, evaluates via OpenRouter, and saves valid matches.
-        """
         logging.info("EduScout checking student portals and education updates...")
         
         for phrase in self.search_phrases:
-            # Construct a safe Google News RSS tracking feed URL
             encoded_query = urllib.parse.quote(phrase)
             rss_url = f"https://news.google.com/rss/search?q={encoded_query}&hl=en-IN&gl=IN&ceid=IN:en"
             
@@ -33,10 +28,7 @@ class EduScout(BaseScout):
                 if response.status_code != 200:
                     continue
                 
-                # Parse the XML response feed format
                 root = ET.fromstring(response.content)
-                
-                # Grab the top 3 freshest news/event items
                 items = root.findall(".//item")[:3]
                 
                 for item in items:
@@ -45,23 +37,28 @@ class EduScout(BaseScout):
                     
                     logging.info(f"EduScout found raw signal: {title}")
                     
-                    # Core Autonomy: Follow the link and grab the webpage body text
+                    # Checkpoint A: Web Scraping Start
+                    logging.info(f"-> Attempting to fetch source content from URL...")
                     page_content = self.fetch_page_text(link)
+                    
                     if not page_content or len(page_content) < 300:
-                        # Fallback to the title text if the page was unreadable or locked
+                        logging.info("-> Source page locked or unreadable. Falling back to title text.")
                         page_content = title
+                    else:
+                        logging.info(f"-> Successfully extracted {len(page_content)} characters of text.")
 
-                    # Hand off the unstructured text to our OpenRouter intelligence layer
+                    # Checkpoint B: OpenRouter Handshake Start
+                    logging.info("-> Sending payload to OpenRouter for financial evaluation...")
                     analysis_result = analyze_signal_with_llm(page_content)
                     
-                    # If the LLM successfully classified a strong opportunity, store it
                     if analysis_result and isinstance(analysis_result, dict):
-                        # Force default evaluation if confidence score is missing
                         confidence = analysis_result.get("confidence_score", 0.0)
+                        logging.info(f"-> LLM evaluation complete. Confidence: {confidence}")
                         
-                        # Only register high-quality prospects to keep database clear
                         if confidence >= 0.75:
                             save_opportunity(analysis_result)
+                    else:
+                        logging.warning("-> LLM analysis returned empty or invalid structural data.")
                             
             except Exception as e:
                 logging.error(f"EduScout encountered error processing phrase '{phrase}': {str(e)}")

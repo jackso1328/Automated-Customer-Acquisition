@@ -4,7 +4,6 @@ from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from src.orchestrator import ScoutOrchestrator
 
-# Setup clear logging so you can see the agent working without a UI
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",

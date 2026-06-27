@@ -1,12 +1,15 @@
 import logging
 from src.scouts.edu_scout import EduScout
+from src.scouts.corp_scout import CorpScout
 
 class ScoutOrchestrator:
     def __init__(self):
-        # We start with the EduScout; we will append agri and corp scouts here next
+        # The swarm is growing. It will run Edu first, then Corp immediately after.
         self.scouts = [
-            EduScout()
+            EduScout(),
+            CorpScout()
         ]
+
 
     def execute_dynamic_search(self):
         """

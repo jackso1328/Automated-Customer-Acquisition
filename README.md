@@ -138,9 +138,3 @@ The autonomous cycle will begin, fetching real-time signals and pushing them to 
 *Built on Trust. Guided by Intelligence. Empowering India.*
 
 ---
-
-## 🎥 Hackathon Reference
-
-[SBI Hackathon 2026 is Here](https://www.youtube.com/shorts/ceh_8CrRFEw)
-
-This video provides an overview of the specific hackathon themes regarding digital adoption and Agentic AI solutions that this framework is designed for.

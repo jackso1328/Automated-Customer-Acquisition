@@ -1,5 +1,7 @@
 import os
 import json
+import time
+import re
 import requests
 import logging
 from dotenv import load_dotenv
@@ -31,8 +33,12 @@ def analyze_signal_with_llm(raw_scraped_text):
         '  "company_or_entity": "Name of the entity",\n'
         '  "entity_type": "Classify as: B2B Corporation, EdTech Startup, Government, or Retail/Student",\n'
         '  "who_needs_funding": "Who actually requires the capital in this specific news event?",\n'
+        '  "detected_signal": "A short 1-sentence summary of the news or event that triggered this opportunity",\n'
         '  "sbi_product_fit": "The exact SBI product they need based strictly on the entity_type",\n'
-        '  "confidence_score": 0.00 to 1.00,\n'
+        '  "score_scale": "An integer from 0 to 10 rating the scale/reach of the opportunity",\n'
+        '  "score_urgency": "An integer from 0 to 10 rating how soon they need the money",\n'
+        '  "score_revenue": "An integer from 0 to 10 rating the loan size or revenue potential",\n'
+        '  "score_sbi_advantage": "An integer from 0 to 10 rating how strong SBI\'s product is for this",\n'
         '  "justification": "Why this product fits the entity type"\n'
         "}"
     )
@@ -50,34 +56,66 @@ def analyze_signal_with_llm(raw_scraped_text):
         ]
     }
 
-    try:
-        print(f"[ENGINE DEBUG] Connecting to OpenRouter Auto-Router...")
-        response = requests.post(OPENROUTER_URL, headers=headers, json=payload, timeout=(5, 15))
-        
-        print(f"[ENGINE DEBUG] Received Response Status Code: {response.status_code}")
-        
-        if response.status_code == 200:
-            response_json = response.json()
-            content_text = response_json['choices'][0]['message']['content'].strip()
+    max_retries = 3
+    base_delay = 2
+
+    for attempt in range(max_retries):
+        try:
+            print(f"[ENGINE DEBUG] Connecting to OpenRouter Auto-Router... (Attempt {attempt + 1}/{max_retries})")
+            response = requests.post(OPENROUTER_URL, headers=headers, json=payload, timeout=(5, 15))
             
-            if content_text.startswith("```json"):
-                content_text = content_text.replace("```json", "").replace("```", "").strip()
-            elif content_text.startswith("```"):
-                content_text = content_text.replace("```", "").strip()
+            print(f"[ENGINE DEBUG] Received Response Status Code: {response.status_code}")
+            
+            if response.status_code == 200:
+                response_json = response.json()
+                content_text = response_json['choices'][0]['message']['content'].strip()
                 
-            parsed_data = json.loads(content_text)
-            return parsed_data
-        else:
-            print(f"[ENGINE DEBUG] API Error Content: {response.text}")
-            logging.error(f"OpenRouter API returned an error status: {response.status_code}")
+                # Robust JSON extraction
+                match = re.search(r'\{.*\}', content_text, re.DOTALL)
+                if match:
+                    json_str = match.group(0)
+                    parsed_data = json.loads(json_str)
+                    
+                    # Deterministic Match Score Calculation
+                    try:
+                        scale = int(str(parsed_data.get("score_scale", 0)).replace('/10','').strip())
+                        urgency = int(str(parsed_data.get("score_urgency", 0)).replace('/10','').strip())
+                        revenue = int(str(parsed_data.get("score_revenue", 0)).replace('/10','').strip())
+                        advantage = int(str(parsed_data.get("score_sbi_advantage", 0)).replace('/10','').strip())
+                        
+                        confidence = (scale + urgency + revenue + advantage) / 40.0
+                        parsed_data["confidence_score"] = round(confidence, 2)
+                        parsed_data["score_scale"] = scale
+                        parsed_data["score_urgency"] = urgency
+                        parsed_data["score_revenue"] = revenue
+                        parsed_data["score_sbi_advantage"] = advantage
+                    except ValueError as ve:
+                        print(f"[ENGINE DEBUG] Math error formatting score: {ve}. Defaulting score.")
+                        parsed_data["confidence_score"] = 0.50
+                        
+                    return parsed_data
+                else:
+                    print(f"[ENGINE DEBUG] Could not find JSON in response: {content_text}")
+                    return None
+            elif response.status_code == 429:
+                print(f"[ENGINE DEBUG] Rate limited. Retrying...")
+            else:
+                print(f"[ENGINE DEBUG] API Error Content: {response.text}")
+                logging.error(f"OpenRouter API returned an error status: {response.status_code}")
+                return None
+                
+        except requests.exceptions.Timeout:
+            print("[ENGINE DEBUG] Request timed out globally.")
+        except json.JSONDecodeError as je:
+            print(f"[ENGINE DEBUG] JSON Parsing Failed. Raw text was: {content_text}")
+            return None
+        except Exception as e:
+            print(f"[ENGINE DEBUG] Fatal local exception thrown: {str(e)}")
             return None
             
-    except requests.exceptions.Timeout:
-        print("[ENGINE DEBUG] Request timed out globally.")
-        return None
-    except json.JSONDecodeError as je:
-        print(f"[ENGINE DEBUG] JSON Parsing Failed. Raw text was: {content_text}")
-        return None
-    except Exception as e:
-        print(f"[ENGINE DEBUG] Fatal local exception thrown: {str(e)}")
-        return None
+        # Exponential backoff
+        if attempt < max_retries - 1:
+            time.sleep(base_delay * (2 ** attempt))
+
+    print("[ENGINE DEBUG] Max retries reached. Failing gracefully.")
+    return None

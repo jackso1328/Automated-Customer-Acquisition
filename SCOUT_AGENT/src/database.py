@@ -22,12 +22,19 @@ def save_opportunity(opportunity_data):
         with open(DB_FILE, "r+", encoding="utf-8") as f:
             data = json.load(f)
             
-            # Simple deduplication check
+            # Improved fuzzy deduplication check
             company_name = opportunity_data.get("company_or_entity", "").strip().lower()
-            duplicate_exists = any(item.get("company_or_entity", "").strip().lower() == company_name for item in data)
+            if not company_name: return False
+            
+            duplicate_exists = False
+            for item in data:
+                existing_name = item.get("company_or_entity", "").strip().lower()
+                if existing_name and (company_name in existing_name or existing_name in company_name):
+                    duplicate_exists = True
+                    break
             
             if duplicate_exists:
-                logging.info(f"Opportunity for '{opportunity_data.get('company_or_entity')}' already exists. Skipping entry.")
+                logging.info(f"Opportunity for '{opportunity_data.get('company_or_entity')}' might already exist. Skipping entry.")
                 return False
                 
             data.append(opportunity_data)

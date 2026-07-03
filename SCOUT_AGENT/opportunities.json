@@ -89,5 +89,103 @@
         "sbi_product_fit": "SBI Education Loan",
         "confidence_score": 0.9,
         "justification": "The text references NEET PG 2025 Counselling, which directly relates to admission processes for postgraduate medical programmes. Students require urgent financial support to cover tuition fees and living expenses to secure their seats, making the SBI Education Loan the appropriate product to meet this need."
+    },
+    {
+        "company_or_entity": "IIT Guwahati",
+        "entity_type": "Government",
+        "who_needs_funding": "Students",
+        "detected_signal": "Second merit list released with fee payment deadline July 3",
+        "sbi_product_fit": "Education Loan",
+        "confidence_score": 0.94,
+        "justification": "The admission merit list and fee deadline indicate student tuition payment needs, matching SBI's education loan product."
+    },
+    {
+        "company_or_entity": "Gujarat Diploma Admission 2026 Aspirants",
+        "entity_type": "Retail/Student",
+        "who_needs_funding": "Students who have secured admission through the provisional merit list and require funds for tuition fees, hostel, and other educational expenses",
+        "detected_signal": "Gujarat Diploma Admission 2026 provisional merit list released today, indicating imminent fee payment deadlines for admitted students",
+        "sbi_product_fit": "SBI Scholar Loan (Education Loan for Diploma/Professional Courses)",
+        "confidence_score": 0.95,
+        "justification": "The news directly concerns student admissions and merit list publication, which triggers immediate need for education financing among admitted students for diploma programs in Gujarat"
+    },
+    {
+        "company_or_entity": "Students applying for MHT CET 2026 CAP",
+        "entity_type": "Retail/Student",
+        "who_needs_funding": "Students needing financial assistance for exam registration, counseling, and admission expenses",
+        "detected_signal": "Announcement of MHT CET 2026 CAP registration start and upcoming merit list indicates students entering the admission process",
+        "sbi_product_fit": "Education Loan",
+        "confidence_score": 0.92,
+        "justification": "The news centers on admissions and merit lists, directly involving students who may need funds for exam fees, counseling, and college admission costs."
+    },
+    {
+        "company_or_entity": "Students admitted through CNET Counselling 2026",
+        "entity_type": "Retail/Student",
+        "who_needs_funding": "Students who have secured seat allotment in Round 1 and need to pay admission/tuition fees",
+        "detected_signal": "CNET Counselling 2026 Round 1 seat allotment results have been released, triggering immediate fee payment deadlines for admitted students",
+        "sbi_product_fit": "SBI Education Loan (Scholar Loan / Global Ed-Vantage / Student Loan)",
+        "confidence_score": 0.92,
+        "justification": "Seat allotment results directly create funding needs for students to secure admissions; this is a classic education loan trigger event where retail students require immediate disbursement for tuition, hostel, and other academic expenses."
+    },
+    {
+        "company_or_entity": "NEET PG 2025 Aspirants / Medical PG Students",
+        "entity_type": "Retail/Student",
+        "who_needs_funding": "Students securing admission in MD/MS programs via NEET PG 2025 counselling",
+        "detected_signal": "NEET PG 2025 counselling schedule announced, triggering admission cycle for medical postgraduate seats across India",
+        "sbi_product_fit": "SBI Scholar Loan / SBI Education Loan for Medical Education",
+        "confidence_score": 0.95,
+        "justification": "Medical PG admissions via NEET PG counselling create immediate demand for education loans to cover high tuition fees in private/deemed universities and government college expenses"
+    },
+    {
+        "company_or_entity": "RUHS CUET 2026 Counselling",
+        "entity_type": "Retail/Student",
+        "who_needs_funding": "Prospective students seeking admission",
+        "detected_signal": "Counselling dates announced with registration now open for 2026 admissions",
+        "sbi_product_fit": "Education Loan",
+        "confidence_score": 0.96,
+        "justification": "The news pertains directly to student admissions counselling, indicating students will need financing for tuition and related expenses."
+    },
+    {
+        "company_or_entity": "ABB",
+        "entity_type": "B2B Corporation",
+        "who_needs_funding": "ABB requires expansion funding for manufacturing and R&D",
+        "detected_signal": "ABB invests substantial capital in manufacturing and critical segments expansion",
+        "sbi_product_fit": "B2B Corporation's infrastructure investments align with ABB's operational and R&D growth objectives",
+        "confidence_score": 1.0,
+        "justification": "ABB's strategic investment in manufacturing and R&D underscores its need for capital to strengthen core operations"
+    },
+    {
+        "company_or_entity": "Tamil Nadu",
+        "entity_type": "Government",
+        "who_needs_funding": "Tamil Nadu government",
+        "detected_signal": "Tamil Nadu may scrap Rs 2K-crore ECR elevated corridor project",
+        "sbi_product_fit": "Government Loans",
+        "confidence_score": 0.95,
+        "justification": "As a state government entity undertaking an infrastructure project, Tamil Nadu would require Government Loans to fund or restructure the ECR elevated corridor initiative."
+    },
+    {
+        "company_or_entity": "MHT CET 2026 CAP Registration",
+        "entity_type": "Retail/Student",
+        "who_needs_funding": "Students seeking engineering/technical admission in Maharashtra",
+        "detected_signal": "MHT CET 2026 CAP registration has begun with merit list scheduled for July 20, triggering student enrollment in technical programs",
+        "sbi_product_fit": "Education Loan",
+        "score_scale": 8,
+        "score_urgency": 6,
+        "score_revenue": 7,
+        "score_sbi_advantage": 9,
+        "justification": "Students pursuing engineering/technical degrees through MHT CET require education financing, and SBI's education loan portfolio is specifically designed for technical/graduate programs with competitive interest rates and study abroad options",
+        "confidence_score": 0.75
+    },
+    {
+        "company_or_entity": "CEIGALL India",
+        "entity_type": "B2B Corporation",
+        "who_needs_funding": "CEIGALL India requires financing to execute the awarded Punjab highway project",
+        "detected_signal": "CEIGALL India received a \u20b9603 crore Letter of Award from NHAI for a Punjab highway project",
+        "sbi_product_fit": "SBI Corporate Term Loan (Project Finance/Working Capital)",
+        "score_scale": 9,
+        "score_urgency": 8,
+        "score_revenue": 9,
+        "score_sbi_advantage": 8,
+        "justification": "As a B2B infrastructure corporation awarded a large contract, CEIGALL India needs corporate/project finance to fund construction activities, which aligns with SBI's strong corporate lending and infrastructure financing capabilities.",
+        "confidence_score": 0.85
     }
 ]

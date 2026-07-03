@@ -42,12 +42,25 @@ document.addEventListener("DOMContentLoaded", () => {
             
             // Percentage styling conversion
             const percentageConf = Math.round((lead.confidence_score || 0) * 100);
+            
+            let breakdownHtml = '';
+            if (lead.score_scale !== undefined) {
+                breakdownHtml = `
+                <div class="score-breakdown">
+                    <div class="score-item"><span>Scale</span> <strong>${lead.score_scale}/10</strong></div>
+                    <div class="score-item"><span>Urgency</span> <strong>${lead.score_urgency}/10</strong></div>
+                    <div class="score-item"><span>Revenue</span> <strong>${lead.score_revenue}/10</strong></div>
+                    <div class="score-item"><span>Advantage</span> <strong>${lead.score_sbi_advantage}/10</strong></div>
+                </div>
+                `;
+            }
 
             card.innerHTML = `
                 <div class="card-top">
                     <div class="company-name">${escapeHtml(lead.company_or_entity)}</div>
                     <div class="confidence-badge">Match: ${percentageConf}%</div>
                 </div>
+                ${breakdownHtml}
                 <div class="signal-text">"${escapeHtml(lead.detected_signal)}"</div>
                 <div class="product-fit-box">
                     <div class="product-label">Recommended SBI Implementation</div>

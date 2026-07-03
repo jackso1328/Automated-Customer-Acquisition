@@ -47,9 +47,11 @@ class CorpScout(BaseScout):
                     
                     if analysis_result and isinstance(analysis_result, dict):
                         confidence = analysis_result.get("confidence_score", 0.0)
+                        tier = analysis_result.get("priority_tier", "P4")
+                        logging.info(f"-> LLM evaluation complete. Confidence: {confidence} | Tier: {tier}")
                         
-                        # Set a slightly higher bar for corporate leads since the loan amounts are massive
-                        if confidence >= 0.85:
+                        # Save P1, P2, P3 leads — the dashboard sorts by score
+                        if tier in ("P1", "P2", "P3"):
                             save_opportunity(analysis_result)
                             
             except Exception as e:

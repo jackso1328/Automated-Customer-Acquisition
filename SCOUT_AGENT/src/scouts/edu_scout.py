@@ -53,9 +53,12 @@ class EduScout(BaseScout):
                     
                     if analysis_result and isinstance(analysis_result, dict):
                         confidence = analysis_result.get("confidence_score", 0.0)
-                        logging.info(f"-> LLM evaluation complete. Confidence: {confidence}")
+                        tier = analysis_result.get("priority_tier", "P4")
+                        logging.info(f"-> LLM evaluation complete. Confidence: {confidence} | Tier: {tier}")
                         
-                        if confidence >= 0.75:
+                        # Save any lead that is P1, P2, or P3 (score >= 50%)
+                        # The dashboard sorts by score, so low-priority leads sink to the bottom
+                        if tier in ("P1", "P2", "P3"):
                             save_opportunity(analysis_result)
                     else:
                         logging.warning("-> LLM analysis returned empty or invalid structural data.")

@@ -93,6 +93,34 @@ document.addEventListener("DOMContentLoaded", () => {
                 penaltyHtml = `<div class="penalty-warning">⚠ Score penalized — critical weakness detected in one or more dimensions</div>`;
             }
 
+            let campaignHtml = '';
+            if (lead.campaign_assets) {
+                const assets = lead.campaign_assets;
+                campaignHtml = `
+                <div class="campaign-container">
+                    <div class="campaign-header">🎉 Generated Campaign Ready</div>
+                    <div class="campaign-content">
+                        <div class="campaign-copy">
+                            <div class="campaign-target-lang"><strong>Target:</strong> ${escapeHtml(assets.customer_persona)}</div>
+                            <div class="campaign-headline">${escapeHtml(assets.headline)}</div>
+                            <div class="campaign-body">${escapeHtml(assets.body_copy).replace(/\n/g, '<br>')}</div>
+                            <div class="campaign-cta">${escapeHtml(assets.call_to_action)}</div>
+                            <div class="campaign-prompt-box"><strong>Image Prompt:</strong> ${escapeHtml(assets.image_prompt)}</div>
+                        </div>
+                        <div class="campaign-visual">
+                            ${assets.generated_image_url ? `<img src="${assets.generated_image_url}" alt="Generated Ad Visual">` : ''}
+                        </div>
+                    </div>
+                </div>
+                `;
+            } else if (tier === "P1" || tier === "P2" || tier === "P3") {
+                campaignHtml = `
+                <button class="generate-btn" onclick="generateCampaign('${escapeHtml(lead.company_or_entity).replace(/'/g, "\\'")}', this)">
+                    Generate Ad Campaign 🚀
+                </button>
+                `;
+            }
+
             card.innerHTML = `
                 <div class="card-top">
                     <div class="company-name">${escapeHtml(lead.company_or_entity)}</div>
@@ -109,9 +137,39 @@ document.addEventListener("DOMContentLoaded", () => {
                     <div class="product-name">${escapeHtml(lead.sbi_product_fit)}</div>
                 </div>
                 <div class="justification-text">${escapeHtml(lead.justification)}</div>
+                ${campaignHtml}
             `;
             leadsGrid.appendChild(card);
         });
+    }
+
+    // Global function to trigger campaign generation
+    window.generateCampaign = async function(companyName, btnElement) {
+        clearInterval(window.pollInterval); // Pause polling
+        
+        try {
+            btnElement.innerText = "Generating with LLM... ⏳";
+            btnElement.disabled = true;
+            btnElement.style.opacity = "0.7";
+            
+            const response = await fetch('/api/generate-ad', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ company_or_entity: companyName })
+            });
+            
+            if (!response.ok) throw new Error("Generation failed");
+            
+            await fetchLeads(); // Reload the UI to show the campaign
+        } catch(err) {
+            console.error(err);
+            alert("Failed to generate campaign. Check server logs.");
+            btnElement.innerText = "Generate Ad Campaign 🚀";
+            btnElement.disabled = false;
+            btnElement.style.opacity = "1";
+        } finally {
+            window.pollInterval = setInterval(fetchLeads, 5000); // Resume polling
+        }
     }
 
     // Simple string escape wrapper to secure text generation inside the browser DOM
@@ -142,5 +200,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Run immediately, then poll the file database every 5 seconds for zero-intervention live drops
     fetchLeads();
-    setInterval(fetchLeads, 5000);
+    window.pollInterval = setInterval(fetchLeads, 5000);
 });

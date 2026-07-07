@@ -329,3 +329,107 @@ body {
     margin-bottom: 1rem;
     border: 1px solid #f0d9a8;
 }
+
+/* ── Campaign Generator UI ── */
+
+.generate-btn {
+    margin-top: 1.5rem;
+    padding: 0.8rem 1.2rem;
+    background-color: var(--sea-blue);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    width: 100%;
+}
+
+.generate-btn:hover:not(:disabled) {
+    background-color: var(--sea-blue-light);
+}
+
+.generate-btn:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.campaign-container {
+    margin-top: 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #fdfdfd;
+}
+
+.campaign-header {
+    background-color: var(--sea-blue);
+    color: white;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.campaign-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.campaign-copy {
+    padding: 1rem;
+}
+
+.campaign-target-lang {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.8rem;
+}
+
+.campaign-headline {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--sea-blue);
+    margin-bottom: 0.8rem;
+    line-height: 1.3;
+}
+
+.campaign-body {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.campaign-cta {
+    display: inline-block;
+    background-color: var(--sea-blue-light);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.campaign-prompt-box {
+    background-color: var(--bg-main);
+    padding: 0.8rem;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.campaign-visual {
+    width: 100%;
+    border-top: 1px solid var(--border-color);
+}
+
+.campaign-visual img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+}

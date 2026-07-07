@@ -93,33 +93,63 @@ document.addEventListener("DOMContentLoaded", () => {
                 penaltyHtml = `<div class="penalty-warning">⚠ Score penalized — critical weakness detected in one or more dimensions</div>`;
             }
 
-            let campaignHtml = '';
+            let intelligenceHtml = `
+                ${breakdownHtml}
+                ${penaltyHtml}
+                <div class="signal-text">"${escapeHtml(lead.detected_signal)}"</div>
+                <div class="product-fit-box">
+                    <div class="product-label">Recommended SBI Product</div>
+                    <div class="product-name">${escapeHtml(lead.sbi_product_fit)}</div>
+                </div>
+                <div class="justification-text">${escapeHtml(lead.justification)}</div>
+            `;
+
+            let adHtml = '';
+            let distHtml = '';
             if (lead.campaign_assets) {
                 const assets = lead.campaign_assets;
-                campaignHtml = `
-                <div class="campaign-container">
-                    <div class="campaign-header">🎉 Generated Campaign Ready</div>
-                    <div class="campaign-content">
-                        <div class="campaign-copy">
-                            <div class="campaign-target-lang"><strong>Target:</strong> ${escapeHtml(assets.customer_persona)}</div>
-                            <div class="campaign-headline">${escapeHtml(assets.headline)}</div>
-                            <div class="campaign-body">${escapeHtml(assets.body_copy).replace(/\n/g, '<br>')}</div>
-                            <div class="campaign-cta">${escapeHtml(assets.call_to_action)}</div>
-                            <div class="campaign-prompt-box"><strong>Image Prompt:</strong> ${escapeHtml(assets.image_prompt)}</div>
-                        </div>
-                        <div class="campaign-visual">
-                            ${assets.generated_image_url ? `<img src="${assets.generated_image_url}" alt="Generated Ad Visual">` : ''}
-                        </div>
+                adHtml = `
+                    <div class="campaign-copy">
+                        <div class="campaign-target-lang"><strong>Target:</strong> ${escapeHtml(assets.customer_persona)}</div>
+                        <div class="campaign-headline">${escapeHtml(assets.headline)}</div>
+                        <div class="campaign-body">${escapeHtml(assets.body_copy).replace(/\n/g, '<br>')}</div>
+                        <div class="campaign-cta">${escapeHtml(assets.call_to_action)}</div>
+                        <div class="campaign-prompt-box"><strong>Image Prompt:</strong> ${escapeHtml(assets.image_prompt)}</div>
                     </div>
+                    <div class="campaign-visual">
+                        ${assets.generated_image_url ? `<img src="${assets.generated_image_url}" alt="Generated Ad Visual">` : ''}
+                    </div>
+                `;
+                
+                distHtml = `
+                    <div class="distributor-box">
+                        <div class="distributor-label">Recommended Platform</div>
+                        <div class="distributor-name">${escapeHtml(assets.recommended_distributor || 'Not Specified')}</div>
+                        <div class="distributor-reasoning">${escapeHtml(assets.distributor_reasoning || 'No reasoning provided.')}</div>
+                        <button class="deploy-btn" onclick="deployCampaign('${escapeHtml(lead.company_or_entity).replace(/'/g, "\\'")}', '${escapeHtml(assets.recommended_distributor || 'Generic').replace(/'/g, "\\'")}', this)">Deploy to ${escapeHtml(assets.recommended_distributor || 'Platform')} 🚀</button>
+                    </div>
+                `;
+                
+            } else if (tier === "P1" || tier === "P2" || tier === "P3") {
+                adHtml = `
+                <div class="tab-placeholder">
+                    <p>No campaign assets generated yet.</p>
+                    <button class="generate-btn" onclick="generateCampaign('${escapeHtml(lead.company_or_entity).replace(/'/g, "\\'")}', this)">
+                        Generate Ad Campaign 🚀
+                    </button>
                 </div>
                 `;
-            } else if (tier === "P1" || tier === "P2" || tier === "P3") {
-                campaignHtml = `
-                <button class="generate-btn" onclick="generateCampaign('${escapeHtml(lead.company_or_entity).replace(/'/g, "\\'")}', this)">
-                    Generate Ad Campaign 🚀
-                </button>
+                distHtml = `
+                <div class="tab-placeholder">
+                    <p>Generate a campaign first to see distributor recommendations.</p>
+                </div>
                 `;
+            } else {
+                 adHtml = `<div class="tab-placeholder"><p>Opportunity priority too low for automated generation.</p></div>`;
+                 distHtml = `<div class="tab-placeholder"><p>Opportunity priority too low.</p></div>`;
             }
+
+            const cardId = 'card-' + Math.random().toString(36).substr(2, 9);
 
             card.innerHTML = `
                 <div class="card-top">
@@ -129,15 +159,22 @@ document.addEventListener("DOMContentLoaded", () => {
                         <div class="confidence-badge">${percentageConf}%</div>
                     </div>
                 </div>
-                ${breakdownHtml}
-                ${penaltyHtml}
-                <div class="signal-text">"${escapeHtml(lead.detected_signal)}"</div>
-                <div class="product-fit-box">
-                    <div class="product-label">Recommended SBI Product</div>
-                    <div class="product-name">${escapeHtml(lead.sbi_product_fit)}</div>
+                
+                <div class="card-tabs">
+                    <button class="tab-btn active" onclick="switchTab(event, '${cardId}-intel')">Intelligence</button>
+                    <button class="tab-btn" onclick="switchTab(event, '${cardId}-ad')">Ad Agent</button>
+                    <button class="tab-btn" onclick="switchTab(event, '${cardId}-dist')">Distributor</button>
                 </div>
-                <div class="justification-text">${escapeHtml(lead.justification)}</div>
-                ${campaignHtml}
+                
+                <div id="${cardId}-intel" class="tab-content active">
+                    ${intelligenceHtml}
+                </div>
+                <div id="${cardId}-ad" class="tab-content">
+                    ${adHtml}
+                </div>
+                <div id="${cardId}-dist" class="tab-content">
+                    ${distHtml}
+                </div>
             `;
             leadsGrid.appendChild(card);
         });
@@ -170,6 +207,41 @@ document.addEventListener("DOMContentLoaded", () => {
         } finally {
             window.pollInterval = setInterval(fetchLeads, 5000); // Resume polling
         }
+    }
+
+    // Global function to handle tab switching
+    window.switchTab = function(evt, tabId) {
+        const card = evt.currentTarget.closest('.opportunity-card');
+        
+        const tabContents = card.getElementsByClassName("tab-content");
+        for (let i = 0; i < tabContents.length; i++) {
+            tabContents[i].style.display = "none";
+            tabContents[i].classList.remove("active");
+        }
+        
+        const tabLinks = card.getElementsByClassName("tab-btn");
+        for (let i = 0; i < tabLinks.length; i++) {
+            tabLinks[i].className = tabLinks[i].className.replace(" active", "");
+        }
+        
+        document.getElementById(tabId).style.display = "block";
+        document.getElementById(tabId).classList.add("active");
+        evt.currentTarget.className += " active";
+    }
+
+    // Global function to deploy campaign
+    window.deployCampaign = function(companyName, platform, btnElement) {
+        btnElement.innerText = "Deploying to API... ⏳";
+        btnElement.disabled = true;
+        btnElement.style.opacity = "0.7";
+        btnElement.style.backgroundColor = "#e67e22"; // orange for working
+        
+        // Simulate network delay
+        setTimeout(() => {
+            btnElement.innerText = "Deployed Successfully! ✅";
+            btnElement.style.backgroundColor = "#2a9d8f"; // green for success
+            btnElement.style.opacity = "1";
+        }, 2000);
     }
 
     // Simple string escape wrapper to secure text generation inside the browser DOM

@@ -30,7 +30,8 @@ def generate_campaign_assets(opportunity):
         "RULES:\n"
         "1. Write the Ad Copy in the most appropriate language for the target (e.g., Hindi for UP/Bihar, Marathi for Maharashtra, English for Corporates).\n"
         "2. Focus on building trust. Never sound demanding or corporate-dry.\n"
-        "3. The image prompt MUST be in English and describe a photorealistic, emotional scene.\n\n"
+        "3. The image prompt MUST be in English and describe a photorealistic, emotional scene.\n"
+        "4. You must select the single best digital advertising platform to distribute this ad on.\n\n"
         "Respond ONLY with a valid JSON object matching this exact schema. Do not include markdown wraps or trailing commentary:\n"
         "{\n"
         '  "target_language": "The best language for this target (e.g. Hindi, English, Tamil)",\n'
@@ -38,7 +39,9 @@ def generate_campaign_assets(opportunity):
         '  "headline": "A catchy, empathetic headline in the target_language. Keep it under 10 words.",\n'
         '  "body_copy": "3-4 bullet points in the target_language highlighting how the SBI product solves their immediate need.",\n'
         '  "call_to_action": "A clear, low-friction CTA (e.g. \'Check Eligibility in 2 Mins\')",\n'
-        '  "image_prompt": "A detailed, English-language prompt for an AI image generator. Describe a photorealistic scene. Must include \'SBI blue color palette\' and \'photorealistic ad style\'. Keep under 50 words."\n'
+        '  "image_prompt": "A detailed, English-language prompt for an AI image generator. Describe a photorealistic scene. Must include \'SBI blue color palette\' and \'photorealistic ad style\'. Keep under 50 words.",\n'
+        '  "recommended_distributor": "The single best platform to show this ad (e.g., \'Google Search Ads\', \'Instagram Feed\', \'LinkedIn Ads\', \'YouTube Pre-roll\')",\n'
+        '  "distributor_reasoning": "A 1-sentence explanation of why this platform is best for this specific target audience."\n'
         "}"
     )
 

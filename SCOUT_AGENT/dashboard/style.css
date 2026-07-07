@@ -433,3 +433,105 @@ body {
     display: block;
     object-fit: cover;
 }
+
+/* ── Tabs ── */
+.card-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1rem;
+    gap: 0.5rem;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 0.5rem 0.8rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.tab-btn:hover {
+    color: var(--sea-blue);
+}
+
+.tab-btn.active {
+    color: var(--sea-blue);
+    border-bottom: 2px solid var(--sea-blue);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.tab-placeholder {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* ── Distributor UI ── */
+.distributor-box {
+    background-color: #f8fcfd;
+    border: 1px solid #bce1f1;
+    padding: 1.25rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.distributor-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.distributor-name {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--sea-blue);
+    margin-bottom: 0.5rem;
+}
+
+.distributor-reasoning {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    font-style: italic;
+}
+
+.deploy-btn {
+    padding: 0.8rem 1.5rem;
+    background-color: var(--success);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.deploy-btn:hover:not(:disabled) {
+    background-color: #21867a;
+}
+
+.deploy-btn:active:not(:disabled) {
+    transform: scale(0.98);
+}

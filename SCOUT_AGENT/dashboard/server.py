@@ -1,107 +1,121 @@
+"""
+server.py — Dashboard HTTP Server
+
+Serves the static dashboard files and provides two API endpoints:
+  GET  /api/opportunities  — Returns all scored leads as JSON.
+  POST /api/generate-ad    — Triggers campaign generation for a specific lead.
+"""
+
 import os
+import sys
 import json
 import http.server
 import socketserver
 import logging
 
 PORT = 8000
-# The JSON database is located one level up from the dashboard folder
-DB_FILE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "opportunities.json"))
+
+# Resolve paths relative to this file, not the CWD
+_DASHBOARD_DIR = os.path.dirname(os.path.abspath(__file__))
+_PROJECT_ROOT = os.path.abspath(os.path.join(_DASHBOARD_DIR, ".."))
+DB_FILE_PATH = os.path.join(_PROJECT_ROOT, "opportunities.json")
+
+# Ensure the src/ package is importable
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+
 
 class DashboardHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
+    """Handles both static file serving and API endpoints."""
+
+    def _send_json(self, status_code, data):
+        """Helper to send a JSON response with proper headers."""
+        self.send_response(status_code)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        self.wfile.write(json.dumps(data).encode("utf-8"))
+
+    def do_OPTIONS(self):
+        """Handle CORS preflight requests."""
+        self.send_response(200)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
+
     def do_GET(self):
-        # API Endpoint for fetching opportunities data dynamically
-        if self.path == '/api/opportunities':
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            # Allow cross-origin requests just in case
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            
-            if os.path.exists(DB_FILE_PATH):
-                try:
-                    with open(DB_FILE_PATH, 'r', encoding='utf-8') as f:
-                        data = f.read()
-                    self.wfile.write(data.encode('utf-8'))
-                except Exception as e:
-                    self.wfile.write(json.dumps([{"error": f"Failed to read data: {str(e)}"}]).encode('utf-8'))
-            else:
-                self.wfile.write(json.dumps([]).encode('utf-8'))
+        if self.path == "/api/opportunities":
+            if not os.path.exists(DB_FILE_PATH):
+                return self._send_json(200, [])
+            try:
+                with open(DB_FILE_PATH, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                self._send_json(200, data)
+            except Exception as e:
+                self._send_json(500, {"error": f"Failed to read data: {e}"})
         else:
-            # Serve regular static assets (index.html, style.css, script.js)
             super().do_GET()
 
     def do_POST(self):
-        if self.path == '/api/generate-ad':
-            content_length = int(self.headers.get('Content-Length', 0))
-            post_data = self.rfile.read(content_length)
-            
-            try:
-                request_json = json.loads(post_data.decode('utf-8'))
-                target_company = request_json.get("company_or_entity")
-                
-                import sys
-                src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-                if src_path not in sys.path:
-                    sys.path.insert(0, src_path)
-                    
-                from src.ad_generator import generate_campaign_assets
-                
-                if os.path.exists(DB_FILE_PATH):
-                    with open(DB_FILE_PATH, 'r+', encoding='utf-8') as f:
-                        data = json.load(f)
-                        
-                        target_opp = None
-                        for item in data:
-                            if item.get("company_or_entity") == target_company:
-                                target_opp = item
-                                break
-                                
-                        if target_opp:
-                            campaign = generate_campaign_assets(target_opp)
-                            if campaign:
-                                target_opp["campaign_assets"] = campaign
-                                f.seek(0)
-                                json.dump(data, f, indent=4)
-                                f.truncate()
-                                
-                                self.send_response(200)
-                                self.send_header('Content-Type', 'application/json')
-                                self.end_headers()
-                                self.wfile.write(json.dumps({"success": True, "campaign": campaign}).encode('utf-8'))
-                            else:
-                                self.send_response(500)
-                                self.send_header('Content-Type', 'application/json')
-                                self.end_headers()
-                                self.wfile.write(json.dumps({"success": False, "error": "LLM generation failed"}).encode('utf-8'))
-                        else:
-                            self.send_response(404)
-                            self.send_header('Content-Type', 'application/json')
-                            self.end_headers()
-                            self.wfile.write(json.dumps({"success": False, "error": "Opportunity not found"}).encode('utf-8'))
-                else:
-                    self.send_response(500)
-                    self.send_header('Content-Type', 'application/json')
-                    self.end_headers()
-                    self.wfile.write(json.dumps({"success": False, "error": "DB not found"}).encode('utf-8'))
-            except Exception as e:
-                self.send_response(500)
-                self.send_header('Content-Type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
+        if self.path == "/api/generate-ad":
+            self._handle_generate_ad()
         else:
-            self.send_response(404)
-            self.end_headers()
+            self._send_json(404, {"error": "Endpoint not found"})
+
+    def _handle_generate_ad(self):
+        """Generates campaign assets for a specific opportunity and persists them."""
+        try:
+            content_length = int(self.headers.get("Content-Length", 0))
+            request_json = json.loads(self.rfile.read(content_length).decode("utf-8"))
+            target_company = request_json.get("company_or_entity")
+
+            if not target_company:
+                return self._send_json(400, {"success": False, "error": "Missing company_or_entity"})
+
+            if not os.path.exists(DB_FILE_PATH):
+                return self._send_json(500, {"success": False, "error": "Database file not found"})
+
+            # Read current data
+            with open(DB_FILE_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+
+            # Find the target opportunity
+            target_opp = next(
+                (item for item in data if item.get("company_or_entity") == target_company),
+                None
+            )
+
+            if not target_opp:
+                return self._send_json(404, {"success": False, "error": "Opportunity not found"})
+
+            # Generate campaign assets
+            from src.ad_generator import generate_campaign_assets
+            campaign = generate_campaign_assets(target_opp)
+
+            if not campaign:
+                return self._send_json(500, {"success": False, "error": "LLM generation failed"})
+
+            # Persist campaign data back to JSON
+            target_opp["campaign_assets"] = campaign
+            with open(DB_FILE_PATH, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=4)
+
+            self._send_json(200, {"success": True, "campaign": campaign})
+
+        except Exception as e:
+            logging.error(f"[Server] Error generating ad: {e}")
+            self._send_json(500, {"success": False, "error": str(e)})
+
 
 def run_dashboard_server():
-    # Ensure we serve files out of the directory where server.py lives
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    
-    # Allow port reuse immediately upon restarting to avoid address-already-in-use blocks
+    """Starts the dashboard HTTP server on the configured port."""
+    os.chdir(_DASHBOARD_DIR)
+
     socketserver.TCPServer.allow_reuse_address = True
-    
+
     with socketserver.TCPServer(("", PORT), DashboardHTTPRequestHandler) as httpd:
-        print(f"\n[SBI Scout Dashboard] Active and running locally at: http://localhost:{PORT}")
+        print(f"\n[SBI Scout Dashboard] Active at: http://localhost:{PORT}")
         print("Keep this terminal open to view your live data feed.\n")
         try:
             httpd.serve_forever()
@@ -109,5 +123,6 @@ def run_dashboard_server():
             print("\nShutting down dashboard server cleanly...")
             httpd.server_close()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     run_dashboard_server()

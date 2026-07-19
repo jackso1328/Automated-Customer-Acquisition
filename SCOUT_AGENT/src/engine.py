@@ -16,18 +16,17 @@ import logging
 from src.llm_client import llm_request
 
 # ──────────────────────────────────────────────────────────────
-# Weighted Scoring Configuration
-# These weights reflect real banking business priorities:
-#   Revenue matters most  — a bank's core purpose is lending capital.
-#   SBI Advantage is the qualifier — no point chasing leads you can't serve.
-#   Urgency drives conversion — time-sensitive leads close faster.
-#   Scale is context — useful but least decisive on its own.
+# Weighted Scoring Configuration (Next-Gen)
+# Rebalanced to prioritize Lifetime Value (LTV) and Propensity
+# alongside traditional revenue metrics.
 # ──────────────────────────────────────────────────────────────
 DIMENSION_WEIGHTS = {
-    "score_scale":         0.15,
-    "score_urgency":       0.25,
-    "score_revenue":       0.35,
-    "score_sbi_advantage": 0.25,
+    "score_scale":         0.10,
+    "score_urgency":       0.15,
+    "score_revenue":       0.20,
+    "score_sbi_advantage": 0.15,
+    "score_ltv":           0.20,
+    "score_propensity":    0.20,
 }
 
 # If ANY single dimension falls at or below this threshold,
@@ -49,52 +48,57 @@ TIER_THRESHOLDS = [
 # Each dimension has concrete definitions so the LLM produces
 # consistent, repeatable scores — not hallucinated guesses.
 # ──────────────────────────────────────────────────────────────
-ANALYSIS_SYSTEM_PROMPT = (
-    "You are an expert corporate banking lead evaluator for State Bank of India (SBI).\n"
-    "Your job is to read news headlines or text and find hidden financial opportunities.\n\n"
-    "CRITICAL LOGIC RULES (PREVENT HALLUCINATIONS):\n"
-    "- If a B2B company or Fintech (like Skydo or Razorpay) is expanding, they need Corporate/SME loans, NOT Education Loans.\n"
-    "- If an EdTech startup is raising funds, the STARTUP needs Corporate funding, the students do not.\n"
-    "- Only recommend Education Loans if the article is about admissions, counselling, exam merit lists, or students directly needing funds.\n\n"
-    "SCORING RUBRIC — use these anchors strictly, do NOT guess:\n\n"
-    "score_scale (How many people/entities are affected?):\n"
-    "  1-2: Hyper-local (single company, <100 people)\n"
-    "  3-4: City-level (one city, hundreds of people)\n"
-    "  5-6: State-level (one state, thousands)\n"
-    "  7-8: Multi-state or sector-wide (lakhs of people)\n"
-    "  9-10: National event (JEE/NEET results, Union Budget, nationwide scheme)\n\n"
-    "score_urgency (How soon do they need the money?):\n"
-    "  1-2: No deadline, general trend or speculation\n"
-    "  3-4: Within 6 months\n"
-    "  5-6: Within 2-3 months\n"
-    "  7-8: Within 30-45 days (fee deadlines, enrollment windows)\n"
-    "  9-10: Within 7-14 days or already overdue\n\n"
-    "score_revenue (What is the loan/account value PER lead?):\n"
-    "  1-2: Micro (<Rs.50K per account — street vendor, zero balance)\n"
-    "  3-4: Small (Rs.50K-Rs.5L — personal loan, KCC)\n"
-    "  5-6: Medium (Rs.5L-Rs.25L — education loan, auto loan)\n"
-    "  7-8: Large (Rs.25L-Rs.5Cr — home loan, SME term loan)\n"
-    "  9-10: Mega (Rs.5Cr+ — corporate project finance, infrastructure)\n\n"
-    "score_sbi_advantage (Does SBI have a strong product for this?):\n"
-    "  1-2: SBI has no relevant product or is at a disadvantage\n"
-    "  3-4: SBI has a generic product, competitors are equally strong\n"
-    "  5-6: SBI has a good product with moderate differentiation\n"
-    "  7-8: SBI has a well-known, competitive product (Scholar Loan, KCC, YONO)\n"
-    "  9-10: SBI is the designated/nodal bank or has a monopoly advantage\n\n"
-    "Respond ONLY with a valid JSON object matching this exact schema. Do not include markdown wraps or trailing commentary:\n"
-    "{\n"
-    '  "company_or_entity": "Name of the entity",\n'
-    '  "entity_type": "Classify as: B2B Corporation, EdTech Startup, Government, or Retail/Student",\n'
-    '  "who_needs_funding": "Who actually requires the capital in this specific news event?",\n'
-    '  "detected_signal": "A short 1-sentence summary of the news or event that triggered this opportunity",\n'
-    '  "sbi_product_fit": "The exact SBI product they need based strictly on the entity_type",\n'
-    '  "score_scale": integer 0-10,\n'
-    '  "score_urgency": integer 0-10,\n'
-    '  "score_revenue": integer 0-10,\n'
-    '  "score_sbi_advantage": integer 0-10,\n'
-    '  "justification": "Why this product fits the entity type"\n'
-    "}"
-)
+ANALYSIS_SYSTEM_PROMPT = """You are an expert corporate banking lead evaluator and Risk/Compliance Officer for State Bank of India (SBI).
+Your job is to read news headlines or text and find hidden financial opportunities while strictly enforcing KYC/AML rules.
+
+CRITICAL LOGIC RULES (PREVENT HALLUCINATIONS):
+- If a B2B company or Fintech is expanding, they need Corporate/SME loans, NOT Education Loans.
+- If an EdTech startup is raising funds, the STARTUP needs Corporate funding, the students do not.
+- Only recommend Education Loans if the article is about admissions, counselling, exam merit lists, or students directly needing funds.
+
+SCORING RUBRIC — use these anchors strictly, do NOT guess:
+
+score_scale (How many people/entities are affected?):
+  1-2: Hyper-local (single company, <100 people)
+  9-10: National event (JEE/NEET results, Union Budget, nationwide scheme)
+
+score_urgency (How soon do they need the money?):
+  1-2: No deadline, general trend or speculation
+  9-10: Within 7-14 days or already overdue
+
+score_revenue (What is the loan/account value PER lead?):
+  1-2: Micro (<Rs.50K per account)
+  9-10: Mega (Rs.5Cr+)
+
+score_sbi_advantage (Does SBI have a strong product for this?):
+  1-2: SBI has no relevant product or is at a disadvantage
+  9-10: SBI is the designated/nodal bank or has a monopoly advantage
+
+score_ltv (Predictive Lifetime Value trajectory):
+  1-2: Very low future needs (e.g. one-off micro loans, bankruptcy)
+  9-10: High exponential lifetime value
+
+score_propensity (Likelihood to convert digitally/immediately):
+  1-2: Vague curiosity, locked by competitor, or regulatory block
+  9-10: Urgent and specific need, highly likely to convert autonomously
+
+Output valid JSON matching this schema:
+{
+    "company_or_entity": "Name of the target company/entity as written in the text",
+    "normalized_company_name": "Standardized canonical name (e.g. map 'RIL' and 'Jio' to 'Reliance Industries', 'TCS' to 'Tata Consultancy Services')",
+    "is_existing_client": boolean (true ONLY if the text explicitly mentions they bank with SBI),
+    "detected_signal": "1-2 sentences summarizing why they need banking services right now",
+    "sbi_product_fit": "e.g., Corporate Term Loan, Working Capital, Forex Services",
+    "score_scale": 1-10,
+    "score_urgency": 1-10,
+    "score_revenue": 1-10,
+    "score_sbi_advantage": 1-10,
+    "score_ltv": 1-10,
+    "score_propensity": 1-10,
+    "compliance_risk_flag": boolean (true ONLY if there are fraud, money laundering, bankruptcy, or regulatory bans),
+    "xai_reasoning": "1-2 sentences mathematically justifying the LTV and Propensity scores"
+}
+"""
 
 
 def _sanitize_score(raw_value, field_name):
@@ -119,7 +123,7 @@ def _sanitize_score(raw_value, field_name):
     return 5
 
 
-def calculate_match_score(parsed_data):
+def calculate_match_score(parsed_data, trust_score=1.0):
     """
     The Deterministic Match Scoring Algorithm.
     
@@ -127,13 +131,8 @@ def calculate_match_score(parsed_data):
         1. Extract and sanitize 4 dimension scores from LLM output.
         2. Compute a weighted sum (not a naive average).
         3. Apply a penalty multiplier if any dimension is critically weak.
-        4. Assign a human-readable Priority Tier (P1–P4).
-    
-    The formula:
-        weighted_raw = Σ (dimension_score × dimension_weight)
-        base_score   = weighted_raw / 10.0   (normalize to 0.0–1.0)
-        penalty      = 0.60 if min(all_dimensions) ≤ 2, else 1.0
-        final_score  = base_score × penalty
+        4. Apply a Veracity Penalty if the trust_score (source credibility) is low.
+        5. Assign a human-readable Priority Tier (P1–P4).
     """
     dimensions = {
         key: _sanitize_score(parsed_data.get(key, 5), key) 
@@ -148,7 +147,10 @@ def calculate_match_score(parsed_data):
     min_dimension = min(dimensions.values())
     penalty = WEAKNESS_PENALTY if min_dimension <= WEAKNESS_THRESHOLD else 1.0
     
-    final_score = round(max(0.0, min(1.0, base_score * penalty)), 2)
+    # Veracity penalty
+    veracity_penalty = 1.0 if trust_score >= 0.5 else 0.5
+    
+    final_score = round(max(0.0, min(1.0, base_score * penalty * veracity_penalty)), 2)
     
     # Priority tier assignment
     percentage = int(final_score * 100)
@@ -157,23 +159,31 @@ def calculate_match_score(parsed_data):
         "P4"
     )
     
+    # ── RISK & COMPLIANCE HARD OVERRIDE ──
+    if parsed_data.get("compliance_risk_flag", False):
+        final_score = 0.0
+        percentage = 0
+        priority_tier = "P4"
+        parsed_data["score_propensity"] = 1  # Force propensity low so it sinks in sorting
+    
     # Write back clean values
     parsed_data.update(dimensions)
     parsed_data["confidence_score"] = final_score
     parsed_data["priority_tier"] = priority_tier
     parsed_data["penalty_applied"] = (penalty < 1.0)
+    parsed_data["veracity_score"] = int(trust_score * 100)
     
     logging.info(
         f"[SCORING] Scale:{dimensions['score_scale']} Urg:{dimensions['score_urgency']} "
         f"Rev:{dimensions['score_revenue']} Adv:{dimensions['score_sbi_advantage']} "
-        f"| Weighted:{weighted_raw:.2f} Penalty:{'YES' if penalty < 1.0 else 'NO'} "
+        f"| Veracity:{parsed_data['veracity_score']} "
         f"| Final:{percentage}% Tier:{priority_tier}"
     )
     
     return parsed_data
 
 
-def analyze_signal_with_llm(raw_scraped_text):
+def analyze_signal_with_llm(raw_scraped_text, trust_score=1.0):
     """
     Sends raw scraped text to the LLM for structured financial analysis,
     then runs the deterministic scoring algorithm on the result.
@@ -185,5 +195,5 @@ def analyze_signal_with_llm(raw_scraped_text):
     )
     
     if parsed_data:
-        return calculate_match_score(parsed_data)
+        return calculate_match_score(parsed_data, trust_score)
     return None
